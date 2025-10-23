@@ -16,19 +16,23 @@
         #gky-questionText, #mlt-questionText {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
+        /* Make buttons feel more interactive */
+        button {
+            transition: all 0.2s ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4"> <!-- Changed to dark background -->
+<body class="bg-gradient-to-br from-gray-900 to-slate-900 flex items-center justify-center min-h-screen p-4"> <!-- Changed background to a subtle gradient -->
 
     <!-- Main App Container -->
-    <div class="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg"> <!-- Changed to dark container -->
+    <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg ring-1 ring-white/10"> <!-- Changed to slate and added a modern 'ring' effect -->
 
         <!-- Game Mode Toggle Buttons -->
-        <div class="flex w-full bg-gray-700 rounded-lg p-1 mb-6">
+        <div class="flex w-full bg-slate-700/50 rounded-lg p-1 mb-6"> <!-- Made tab background slightly transparent -->
             <button id="gky-tab" class="w-1/2 bg-indigo-600 text-white rounded-md py-2 font-semibold transition-all duration-300">
                 Get to Know You!
             </button>
-            <button id="mlt-tab" class="w-1/2 text-gray-400 rounded-md py-2 font-semibold transition-all duration-300">
+            <button id="mlt-tab" class="w-1/2 text-gray-400 rounded-md py-2 font-semibold transition-all duration-300 hover:bg-slate-700/50 hover:text-white">
                 Most Likely To...
             </button>
         </div>
@@ -42,8 +46,8 @@
             <div id="gky-counter" class="text-center text-sm text-gray-500 mb-2">Question 1 / 250</div> <!-- Adjusted text color -->
 
             <!-- The Flashcard -->
-            <div id="gky-questionCard" class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg min-h-[250px] sm:min-h-[300px] flex items-center justify-center p-6 sm:p-10"> <!-- Adjusted min height -->
-                <p id="gky-questionText" class="text-white text-2xl sm:text-3xl font-semibold text-center">
+            <div id="gky-questionCard" class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg min-h-[250px] sm:min-h-[300px] flex items-center justify-center p-6 sm:p-10"> <!-- Changed to rounded-2xl -->
+                <p id="gky-questionText" class="text-white text-3xl sm:text-4xl font-bold text-center"> <!-- Made text bigger and bolder -->
                     <!-- Question will be loaded here -->
                 </p>
             </div>
@@ -51,12 +55,12 @@
             <!-- Button Controls -->
             <div class="flex flex-col sm:flex-row gap-4 mt-6">
                 <!-- Shuffle Button -->
-                <button id="gky-shuffleButton" class="w-full sm:w-1/2 bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                <button id="gky-shuffleButton" class="w-full sm:w-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-amber-500 hover:to-orange-600 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-800">
                     Shuffle Deck
                 </button>
                 
                 <!-- Next Button -->
-                <button id="gky-nextButton" class="w-full sm:w-1/2 bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                <button id="gky-nextButton" class="w-full sm:w-1/2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-indigo-600 hover:to-blue-600 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-800">
                     Next Question
                 </button>
             </div>
@@ -71,8 +75,8 @@
             <div id="mlt-counter" class="text-center text-sm text-gray-500 mb-2">Question 1 / 150</div>
 
             <!-- The Flashcard -->
-            <div id="mlt-questionCard" class="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl shadow-lg min-h-[250px] sm:min-h-[300px] flex items-center justify-center p-6 sm:p-10">
-                <p id="mlt-questionText" class="text-white text-2xl sm:text-3xl font-semibold text-center">
+            <div id="mlt-questionCard" class="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl shadow-lg min-h-[250px] sm:min-h-[300px] flex items-center justify-center p-6 sm:p-10"> <!-- Changed to rounded-2xl -->
+                <p id="mlt-questionText" class="text-white text-3xl sm:text-4xl font-bold text-center"> <!-- Made text bigger and bolder -->
                     <!-- Question will be loaded here -->
                 </p>
             </div>
@@ -80,12 +84,12 @@
             <!-- Button Controls -->
             <div class="flex flex-col sm:flex-row gap-4 mt-6">
                 <!-- Shuffle Button -->
-                <button id="mlt-shuffleButton" class="w-full sm:w-1/2 bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                <button id="mlt-shuffleButton" class="w-full sm:w-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-amber-500 hover:to-orange-600 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-800">
                     Shuffle Deck
                 </button>
                 
                 <!-- Next Button -->
-                <button id="mlt-nextButton" class="w-full sm:w-1/2 bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                <button id="mlt-nextButton" class="w-full sm:w-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-teal-600 hover:to-cyan-600 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-slate-800">
                     Next Question
                 </button>
             </div>
@@ -119,8 +123,8 @@
                 gkyGame.classList.add('hidden');
                 // Update tab styles
                 mltTab.classList.add('bg-indigo-600', 'text-white');
-                mltTab.classList.remove('text-gray-400');
-                gkyTab.classList.add('text-gray-400');
+                mltTab.classList.remove('text-gray-400', 'hover:bg-slate-700/50', 'hover:text-white');
+                gkyTab.classList.add('text-gray-400', 'hover:bg-slate-700/50', 'hover:text-white');
                 gkyTab.classList.remove('bg-indigo-600', 'text-white');
             });
 
@@ -651,5 +655,6 @@
     </script>
 </body>
 </html>
+
 
 
