@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friend Questions</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Use the Inter font, a common choice with Tailwind */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* A little extra polish for the text transition */
+        #gky-questionText, #mlt-questionText {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4"> <!-- Changed to dark background -->
+
+    <!-- Main App Container -->
+    <div class="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg"> <!-- Changed to dark container -->
+
+        <!-- Game Mode Toggle Buttons -->
+        <div class="flex w-full bg-gray-700 rounded-lg p-1 mb-6">
+            <button id="gky-tab" class="w-1/2 bg-indigo-600 text-white rounded-md py-2 font-semibold transition-all duration-300">
+                Get to Know You!
+            </button>
+            <button id="mlt-tab" class="w-1/2 text-gray-400 rounded-md py-2 font-semibold transition-all duration-300">
+                Most Likely To...
+            </button>
+        </div>
+
+        <!-- --- Game 1: Get to Know You --- -->
+        <div id="game-gky">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">Get to Know You!</h1> <!-- Adjusted text size -->
+            <p class="text-gray-400 text-center mb-4">Click "Next" for a new question or "Shuffle" to start over.</p> <!-- Adjusted text color -->
+
+            <!-- Question Counter -->
+            <div id="gky-counter" class="text-center text-sm text-gray-500 mb-2">Question 1 / 250</div> <!-- Adjusted text color -->
+
+            <!-- The Flashcard -->
+            <div id="gky-questionCard" class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg min-h-[250px] sm:min-h-[300px] flex items-center justify-center p-6 sm:p-10"> <!-- Adjusted min height -->
+                <p id="gky-questionText" class="text-white text-2xl sm:text-3xl font-semibold text-center">
+                    <!-- Question will be loaded here -->
+                </p>
+            </div>
+
+            <!-- Button Controls -->
+            <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                <!-- Shuffle Button -->
+                <button id="gky-shuffleButton" class="w-full sm:w-1/2 bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                    Shuffle Deck
+                </button>
+                
+                <!-- Next Button -->
+                <button id="gky-nextButton" class="w-full sm:w-1/2 bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                    Next Question
+                </button>
+            </div>
+        </div>
+
+        <!-- --- Game 2: Most Likely To --- -->
+        <div id="game-mlt" class="hidden"> <!-- Hidden by default -->
+            <h1 class="text-2xl sm:text-3xl font-bold text-white text-center mb-2">Most Likely To...</h1>
+            <p class="text-gray-400 text-center mb-4">Who's the most likely one in your group?</p>
+
+            <!-- Question Counter -->
+            <div id="mlt-counter" class="text-center text-sm text-gray-500 mb-2">Question 1 / 150</div>
+
+            <!-- The Flashcard -->
+            <div id="mlt-questionCard" class="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl shadow-lg min-h-[250px] sm:min-h-[300px] flex items-center justify-center p-6 sm:p-10">
+                <p id="mlt-questionText" class="text-white text-2xl sm:text-3xl font-semibold text-center">
+                    <!-- Question will be loaded here -->
+                </p>
+            </div>
+
+            <!-- Button Controls -->
+            <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                <!-- Shuffle Button -->
+                <button id="mlt-shuffleButton" class="w-full sm:w-1/2 bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                    Shuffle Deck
+                </button>
+                
+                <!-- Next Button -->
+                <button id="mlt-nextButton" class="w-full sm:w-1/2 bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                    Next Question
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Tab Switching Logic ---
+            const gkyTab = document.getElementById('gky-tab');
+            const mltTab = document.getElementById('mlt-tab');
+            const gkyGame = document.getElementById('game-gky');
+            const mltGame = document.getElementById('game-mlt');
+
+            gkyTab.addEventListener('click', () => {
+                // Show GKY game, hide MLT game
+                gkyGame.classList.remove('hidden');
+                mltGame.classList.add('hidden');
+                // Update tab styles
+                gkyTab.classList.add('bg-indigo-600', 'text-white');
+                gkyTab.classList.remove('text-gray-400');
+                mltTab.classList.add('text-gray-400');
+                mltTab.classList.remove('bg-indigo-600', 'text-white');
+            });
+
+            mltTab.addEventListener('click', () => {
+                // Show MLT game, hide GKY game
+                mltGame.classList.remove('hidden');
+                gkyGame.classList.add('hidden');
+                // Update tab styles
+                mltTab.classList.add('bg-indigo-600', 'text-white');
+                mltTab.classList.remove('text-gray-400');
+                gkyTab.classList.add('text-gray-400');
+                gkyTab.classList.remove('bg-indigo-600', 'text-white');
+            });
+
+
+            // --- === Game 1: Get to Know You (GKY) Logic === ---
+
+            // --- The GKY Questions ---
+            const gkyQuestions = [
+                // Simple Icebreakers
+                "What's your favorite color?",
+                "Coffee or tea?",
+                "What's your favorite food?",
+                "Are you a morning person or a night owl?",
+                "What's the last song you listened to?",
+                "Do you prefer movies or books?",
+                "What's your favorite season?",
+                "If you could live anywhere, where would it be?",
+                "What's your favorite animal?",
+                "Do you have any pets?",
+                "What's your favorite holiday?",
+                "Sweet or savory?",
+                "What's your zodiac sign?",
+                "Do you play any musical instruments?",
+                "What's your favorite movie?",
+                
+                // Funny / Silly
+                "What's the weirdest food you've ever eaten?",
+                "If you were a vegetable, which one would you be and why?",
+                "What's your most useless talent?",
+                "What's the funniest joke you know by heart?",
+                "If you had to be haunted by a ghost, what kind of ghost would you prefer?",
+                "What's a weird smell you actually like?",
+                "Would you rather have fingers for toes or toes for fingers?",
+                "What's the silliest thing you've ever done?",
+                "If animals could talk, which one would be the rudest?",
+                "What's the weirdest dream you've ever had?",
+                "What's your go-to dance move?",
+                "If you were a potato, how would you want to be cooked?",
+                "What's the worst pickup line you've ever heard?",
+                "Do you believe in aliens?",
+                "What superpower would be the most inconvenient?",
+
+                // Fun / Hypotheticals
+                "If you could have any superpower, what would it be?",
+                "Would you rather travel to the past or the future?",
+                "If you won the lottery, what's the first thing you'd buy?",
+                "If you could time travel, what one event would you witness?",
+                "What fictional world would you most like to live in?",
+                "If you could be famous for one thing, what would it be?",
+                "You can only eat one food for the rest of your life. What is it?",
+                "If you could eliminate one thing from your daily routine, what would it be?",
+                "What's your perfect weekend?",
+                "If you could have dinner with any three people (dead or alive), who?",
+                "Would you rather be able to fly or be invisible?",
+                "If you could instantly become an expert in one thing, what would it be?",
+                "What's your dream vacation?",
+                "If you could switch lives with someone for a day, who would it be?",
+                "What's at the top of your bucket list?",
+
+                // Deeper / Serious
+                "What are you most grateful for?",
+                "What's one goal you're working on right now?",
+                "What's your definition of success?",
+                "What's the best piece of advice you've ever received?",
+                "What's something you're proud of?",
+                "Who has been the most influential person in your life?",
+                "What's a challenge you've overcome?",
+                "What's one thing you wish more people knew about you?",
+                "What's your biggest fear?",
+                "How do you like to relax after a long day?",
+                "What's a cause or issue you care deeply about?",
+                "What does 'home' mean to you?",
+                "What's a mistake you learned a lot from?",
+                "What's something you believe in that many people don't?",
+                "If you could give your younger self one piece of advice, what would it be?",
+
+                // Memories / Experiences
+                "What's your favorite childhood memory?",
+                "Tell me about a time you laughed so hard you cried.",
+                "What's the best gift you've ever received?",
+                "What's your favorite memory with a friend?",
+                "What's the most beautiful place you've ever visited?",
+                "What was your favorite subject in school?",
+                "What's a skill you'd like to learn?",
+                "What's the best concert or live event you've ever been to?",
+                "What's the most spontaneous thing you've ever done?",
+                "What's a family tradition you love?",
+                "What's a book or movie that changed your perspective on something?",
+                "What's the kindest thing someone has ever done for you?",
+                "What's your 'happy place'?",
+                "What's a memory that always makes you smile?",
+                "What's the first thing you remember buying with your own money?",
+                
+                // More Mix
+                "What's your favorite thing about yourself?",
+                "What's your biggest pet peeve?",
+                "If your life was a movie, what would the title be?",
+                "What's something you're terrible at but love doing anyway?",
+                "What's your favorite way to spend a rainy day?",
+                "What's the best compliment you've ever received?",
+                "What's something you've always wanted to try but haven't?",
+                "What's your 'unpopular opinion'?",
+                "If you had to give up one of your five senses, which one?",
+                "What's your favorite board game or video game?",
+                "Do you have a 'guilty pleasure' song or movie?",
+                "What's the best advice you'd give to someone?",
+                "What's something that instantly makes your day better?",
+                "If you could solve one world problem, what would it be?",
+                "What do you value most in a friendship?",
+
+                // --- 150 New Questions Added ---
+
+                // Would You Rather (20)
+                "Would you rather have a personal chef or a personal driver?",
+                "Would you rather be able to speak all languages or play all musical instruments?",
+                "Would you rather live in a house shaped like a giant boot or a giant teapot?",
+                "Would you rather have unlimited free flights or unlimited free meals at any restaurant?",
+                "Would you rather never be stuck in traffic again or never get a cold again?",
+                "Would you rather be able to control fire or water?",
+                "Would you rather have a photographic memory or be able to forget anything on command?",
+                "Would you rather be an amazing singer or an amazing dancer?",
+                "Would you rather have a dragon or be a dragon?",
+                "Would you rather give up social media or give up streaming services for a year?",
+                "Would you rather have everything you eat be too salty or too sweet?",
+                "Would you rather have to sing everything you say or dance everywhere you go?",
+                "Would you rather be able to breathe underwater or have the agility of a cat?",
+                "Would you rather find $100 on the street or find a lost item you've been missing for years?",
+                "Would you rather have a third eye or a third arm?",
+                "Would you rather only be able to whisper or only be able to shout?",
+                "Would you rather live without music or without movies?",
+                "Would you rather be famous when you are alive and forgotten when you die, or unknown when you are alive but famous after you die?",
+                "Would you rather have the ability to see 10 minutes into your own future or 10 minutes into anyone else's future?",
+                "Would you rather your only mode of transportation be a unicycle or a pogo stick?",
+
+                // Favourites (20)
+                "What's your favorite smell?",
+                "What's your favorite sound?",
+                "Who is your favorite fictional character?",
+                "What's your favorite app on your phone?",
+                "What's your favorite piece of clothing you own?",
+                "What's your favorite ice cream flavor?",
+                "Who is your favorite comedian?",
+                "What's your favorite type of weather?",
+                "What's your favorite accent?",
+                "What's your favorite childhood TV show or cartoon?",
+                "What's your favorite brand?",
+                "What's your favorite type of tree?",
+                "What's your favorite thing to do on a Friday night?",
+                "What's your favorite fast food restaurant?",
+                "What's your favorite pizza topping?",
+                "Who is your favorite author?",
+                "What's your favorite flower?",
+                "What's your favorite type of cuisine?",
+                "What's your favorite word?",
+                "What's your favorite thing to cook or bake?",
+
+                // Hypotheticals (30)
+                "If you could invent a new holiday, what would it be and how would it be celebrated?",
+                "If you had to teach a class on one subject, what would it be?",
+                "If you could open any kind of shop, what would you sell?",
+                "If you could be any mythical creature, what would you choose?",
+                "If you could bring one extinct animal back to life, which one?",
+                "If you were given three wishes, what would you wish for (and no wishing for more wishes!)?",
+                "If you could ask your future self one question, what would it be?",
+                "If you had to live in a different historical period, which one would you choose?",
+                "If you could get rid of one invention, which one would you choose?",
+                "If you could create one law that everyone had to follow, what would it be?",
+                "If you could have a conversation with your pet, what's the first thing you'd ask them?",
+                "If you were a ghost, who would you haunt and why?",
+                "If you could be a contestant on any game show, which one?",
+                "If you were stranded on a desert island, what three items would you want with you?",
+                "If you could choose your own name, what would you pick?",
+                "If you found a suitcase full of money, what would you do?",
+                "If you could only use one condiment for the rest of your life, what would it be?",
+                "If you could have any animal as a pet, legal or not, what would it be?",
+                "If you could be a background character in any movie, which movie?",
+                "If you could instantly learn any language, which one?",
+                "If you were a superhero, what would your name and weakness be?",
+                "If you had to wear one costume for an entire year, what would it be?",
+                "If you could redesign the flag for our country, what would it look like?",
+                "If you could build your dream house, what's one weird feature it would have?",
+                "If you could be the CEO of any company, which one?",
+                "If you could only listen to one artist for the rest of your life, who?",
+                "If you could go on a road trip with any celebrity, who would you choose?",
+                "If you could set a new fashion trend, what would it be?",
+                "If you could star in any movie role, what would it be?",
+                "If you could replace handshakes with a new greeting, what would it be?",
+
+                // Personal / Deeper (30)
+                "What's something you're looking forward to?",
+                "What's one thing you'd like to be better at?",
+                "What's a small act of kindness you recently witnessed or did?",
+                "What's something that makes you feel nostalgic?",
+                "What's one thing you could talk about for hours?",
+                "What's your definition of a 'perfect day'?",
+                "What's a misconception people often have about you?",
+                "What's the most adventurous thing you've ever done?",
+                "What's a habit you're proud of breaking?",
+                "What's a habit you'd like to start?",
+                "What's something you're currently worried about?",
+                "What's a topic you wish you knew more about?",
+                "How do you show people you care about them?",
+                "What's your 'love language'?",
+                "What's a book that you think everyone should read?",
+                "What's a movie that made you cry?",
+                "What's one thing you can't live without?",
+                "What's your favorite thing about where you live?",
+                "What's one quality you really admire in other people?",
+                "What's something you've learned about yourself this year?",
+                "What's your philosophy on life, in a few words?",
+                "What's something you'd do if you knew you couldn't fail?",
+                "What's your favorite way to be creative?",
+                "What's a 'perfect' relationship (of any kind) look like to you?",
+                "What's a fear you'd like to conquer?",
+                "What's the best decision you've ever made?",
+                "What's the worst decision you've ever made?",
+                "What's something you're forgiving yourself for?",
+                "When do you feel most like your true self?",
+                "What's one simple pleasure that brings you joy?",
+
+                // Silly / Random (50)
+                "What's in your fridge right now?",
+                "What was the last thing you Googled?",
+                "If you were a sandwich, what would you be?",
+                "What's the weirdest thing in your bag or pockets?",
+                "What's your most-used emoji?",
+                "If you were arrested with no explanation, what would your friends and family assume you did?",
+                "What's a weird fact you know?",
+                "What's the best 'dad joke' you know?",
+                "Do you think pineapple belongs on pizza?",
+                "Is a hotdog a sandwich? Why or why not?",
+                "What's a conspiracy theory you find funny?",
+                "What's a word you can never spell correctly on the first try?",
+                "What's your 'spirit animal'?",
+                "What's a song you know all the words to, even if you don't want to?",
+                "What's your favorite meme of all time?",
+                "If you had to rename yourself, what would your new name be?",
+                "What's the most ridiculous purchase you've ever made?",
+                "What's your go-to karaoke song?",
+                "What's a common saying or phrase you don't understand?",
+                "If you were a flavor of ice cream, what would you be called?",
+                "What's the most embarrassing thing that's happened to you recently?",
+                "What's the strangest compliment you've ever received?",
+                "What's your favorite smell from your childhood?",
+                "What's a food combination you love that others find weird?",
+                "What's a movie quote you use in real life?",
+                "What's something you're really snobby about?",
+                "What's the weirdest place you've ever fallen asleep?",
+                "If you had a warning label, what would it say?",
+                "What's a word that you always mispronounce?",
+                "What's the best wi-fi name you've ever seen?",
+                "What's the last photo you took on your phone?",
+                "What's the worst movie you've ever seen?",
+                "What's something you think is overrated?",
+                "What's something you think is underrated?",
+                "What's a weird superstition you have?",
+                "What's your favorite 'bad' movie?",
+                "If you had to eat a crayon, what color would you choose?",
+                "What's a historical event you'd love to see as it happened?",
+                "What's the most boring superpower you can think of?",
+                "What's your zombie apocalypse survival plan?",
+                "What's the worst haircut you've ever had?",
+                "What's the most bizarre text message you've ever received?",
+                "What's a household chore you actually enjoy?",
+                "What's the weirdest thing a guest has done at your house?",
+                "If you could talk to one species of animal, which would it be?",
+                "What's the best prank you've ever pulled or seen?",
+                "What's a word that makes you laugh every time you hear it?",
+                "What's the most useless thing you own?",
+                "What's a common food you've never tried?",
+                "What's your 'perfect' sandwich?"
+            ];
+
+            let gkyCurrentIndex = 0;
+            let gkyShuffledQuestions = [];
+
+            // Get GKY DOM Elements
+            const gkyQuestionTextEl = document.getElementById('gky-questionText');
+            const gkyCounterTextEl = document.getElementById('gky-counter');
+            const gkyNextButton = document.getElementById('gky-nextButton');
+            const gkyShuffleButton = document.getElementById('gky-shuffleButton');
+
+            // --- GKY Main Functions ---
+
+            function shuffleGKYQuestions() {
+                gkyShuffledQuestions = [...gkyQuestions];
+                for (let i = gkyShuffledQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [gkyShuffledQuestions[i], gkyShuffledQuestions[j]] = [gkyShuffledQuestions[j], gkyShuffledQuestions[i]];
+                }
+                gkyCurrentIndex = 0;
+                displayGKYQuestion(gkyCurrentIndex);
+            }
+
+            function displayGKYQuestion(index) {
+                gkyQuestionTextEl.style.opacity = '0';
+                gkyQuestionTextEl.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    gkyQuestionTextEl.textContent = gkyShuffledQuestions[index];
+                    gkyCounterTextEl.textContent = `Question ${index + 1} / ${gkyShuffledQuestions.length}`;
+                    gkyQuestionTextEl.style.opacity = '1';
+                    gkyQuestionTextEl.style.transform = 'translateY(0)';
+                }, 300);
+            }
+
+            function nextGKYQuestion() {
+                gkyCurrentIndex++;
+                if (gkyCurrentIndex >= gkyShuffledQuestions.length) {
+                    gkyCurrentIndex = 0;
+                }
+                displayGKYQuestion(gkyCurrentIndex);
+            }
+
+            // --- GKY Initialization ---
+            gkyNextButton.addEventListener('click', nextGKYQuestion);
+            gkyShuffleButton.addEventListener('click', shuffleGKYQuestions);
+            shuffleGKYQuestions(); // Start GKY game by shuffling
+
+
+            // --- === Game 2: Most Likely To (MLT) Logic === ---
+
+            // --- The MLT Questions ---
+            const mltQuestions = [
+                // Funny (50) - Localized
+                "Most likely to accidentally start a cult (or just a K-Pop fan club).",
+                "Most likely to trip over nothing while walking in Greenbelt.",
+                "Most likely to laugh at a funeral (and blame it on a funny memory).",
+                "Most likely to text the wrong person a piece of *'Marites'* (gossip).",
+                "Most likely to become a viral TikTok star by accident.",
+                "Most likely to try and eat balut for the first time... and fail.",
+                "Most likely to forget their own birthday but remember everyone's.",
+                "Most likely to adopt 10 *puspins* (pusang Pinoy).",
+                "Most likely to be patient zero, but still go to Jollibee.",
+                "Most likely to get stuck in a crowded MRT train.",
+                "Most likely to have the weirdest Shopee/Lazada search history.",
+                "Most likely to get into a fight with a *tuko* (gecko) (and lose).",
+                "Most likely to be caught talking to a *manong* street food vendor for an hour.",
+                "Most likely to put banana ketchup on their spaghetti... and love it.",
+                "Most likely to have a *'palengkera'* (market-goer) moment in public.",
+                "Most likely to fall asleep during a *brownout* (power outage).",
+                "Most likely to get lost inside SM Mall of Asia.",
+                "Most likely to cry over a sad Jollibee commercial.",
+                "Most likely to wear *pambahay* (house clothes) to a quick mall trip.",
+                "Most likely to invent a useless but hilarious product (like a *tabo* with bluetooth).",
+                "Most likely to start a conga line at a fiesta.",
+                "Most likely to challenge Vice Ganda to a joke contest.",
+                "Most likely to have a secret identity as a *jeepney* driver.",
+                "Most likely to be a terrible spy (too friendly).",
+                "Most likely to get caught having a full concert at a videoke.",
+                "Most likely to clog a toilet and blame it on the lack of a bidet.",
+                "Most likely to burn *kanin* (rice) in the rice cooker.",
+                "Most likely to believe a fake news article on Facebook.",
+                "Most likely to get a really bad, impulsive tattoo in Baguio.",
+                "Most likely to be the main character in a *teleserye* (TV drama).",
+                "Most likely to be the 'therapist' friend who just says *'Laban lang!'* (Just fight!).",
+                "Most likely to be the *'tita'* or *'tito'* of the group.",
+                "Most likely to lose their keys or phone 5 seconds after holding them.",
+                "Most likely to be eating snacks at 2 AM (probably *sinangag* or instant noodles).",
+                "Most likely to have a strong opinion on which adobo is the best.",
+                "Most likely to be a super-fan of a K-Drama *oppa*.",
+                "Most likely to try a bizarre food challenge (like 10 durians).",
+                "Most likely to think they have *'anting-anting'* (an amulet).",
+                "Most likely to get ID'd for buying Red Horse beer at age 30.",
+                "Most likely to pull a 'push' door at 7-Eleven.",
+                "Most likely to start an argument about whether adobo should have *toyo* (soy sauce) or not.",
+                "Most likely to have 50 tabs open on their browser (all Shopee).",
+                "Most likely to forget a main character's name in a movie they just watched.",
+                "Most likely to name their child something... unique (like 'Covid' or 'HTML').",
+                "Most likely to win a Mang Inasal unlimited rice challenge.",
+                "Most likely to get 'hangry' while stuck in EDSA traffic.",
+                "Most likely to get lost using Waze.",
+                "Most likely to be a picky eater (but still eats Jollibee).",
+                "Most likely to hoard Jollibee gravy packets or Mang Inasal chili oil.",
+                "Most likely to be a professional napper (mastered the *siesta*).",
+                
+                // Trivial / General (50) - Localized
+                "Most likely to win the lottery and spend it all on a trip to Boracay.",
+                "Most likely to become president (of the barangay).",
+                "Most likely to become a billionaire (by selling milk tea).",
+                "Most likely to be a one-hit wonder on TikTok.",
+                "Most likely to move to a different country to be an OFW.",
+                "Most likely to run a marathon without training (fueled by *pan de sal*).",
+                "Most likely to write a best-selling novel (about *hugot*).",
+                "Most likely to give all their money to a street *carolinger*.",
+                "Most likely to live 'off the grid' (in Palawan).",
+                "Most likely to become a famous artist (like Heart Evangelista).",
+                "Most likely to start their own *ukay-ukay* (thrift) business.",
+                "Most likely to be a street performer in BGC.",
+                "Most likely to audition for *Pinoy Big Brother* (PBB).",
+                "Most likely to go skydiving (over Cebu).",
+                "Most likely to explore a haunted Baguio hotel.",
+                "Most likely to become a vegetarian (but still eats *lechon*).",
+                "Most likely to get married first (for the *pakimkim*).",
+                "Most likely to have the most *inaanak* (godchildren).",
+                "Most likely to be the 'responsible one' who books the Grab for everyone.",
+                "Most likely to be late for their own wedding ('Filipino time').",
+                "Most likely to forget a close friend's birthday (but makes up for it).",
+                "Most likely to always be on time (a rare breed).",
+                "Most likely to read 100 Wattpad novels in a year.",
+                "Most likely to binge-watch an entire K-Drama series in one weekend.",
+                "Most likely to be the last one to get a 'green joke'.",
+                "Most likely to be the first one to get the new iPhone.",
+                "Most likely to have the cleanest house (thanks to the *walis tambo*).",
+                "Most likely to have the messiest car (full of fast-food wrappers).",
+                "Most likely to be a social media influencer.",
+                "Most likely to quit their job to travel the world (and vlog it).",
+                "Most likely to be a spy (for *'Marites'*).",
+                "Most likely to win an argument (by being the loudest).",
+                "Most likely to hold a grudge (*tampo* for weeks).",
+                "Most likely to forgive someone easily (after being treated to milk tea).",
+                "Most likely to be the most optimistic (always finds a silver lining).",
+                "Most likely to be the most pessimistic (always complaining about the heat).",
+                "Most likely to be the best cook (can make perfect *sinigang*).",
+                "Most likely to be the worst cook (can't even fry an egg).",
+                "Most likely to remember everyone's birthday.",
+                "Most likely to be the most stubborn (as stubborn as a *kalabaw*).",
+                "Most likely to be the most likely to change their mind.",
+                "Most likely to be the life of the party (the videoke mic-hogger).",
+                "Most likely to *'Irish exit'* (leave without saying goodbye) from a party.",
+                "Most likely to win a Nobel Prize (for patience in traffic).",
+                "Most likely to go to space (to get away from the traffic).",
+                "Most likely to be the most organized (with their GCash expenses).",
+                "Most likely to be the most spontaneous (for an *'unplanned'* beach trip).",
+                "Most likely to be a minimalist.",
+                "Most likely to be a hoarder (of plastic bags and empty containers).",
+                "Most likely to be the most dramatic (very *'ma-arte'*).",
+
+                // Dilemma-Based (50) - Localized
+                "Most likely to press 'the button' (save 1, kill 5).",
+                "Most likely to tell a white lie to protect a friend (from their *tita*).",
+                "Most likely to tell the hard truth, even if it hurts.",
+                "Most likely to sacrifice themselves for the greater good.",
+                "Most likely to choose money over love.",
+                "Most likely to choose love over money (but money is nice, *'no?'*).",
+                "Most likely to read someone's mind without their permission.",
+                "Most likely to go back in time and change a small event, causing chaos.",
+                "Most likely to want to know the exact date of their death.",
+                "Most likely to want to live forever.",
+                "Most likely to give up their phone for a year for 1 Million Pesos.",
+                "Most likely to rather be too hot (like Manila summer) than too cold (like Baguio 'winter').",
+                "Most likely to rather be too cold than too hot.",
+                "Most likely to live without OPM (Original Pilipino Music).",
+                "Most likely to live without K-Dramas.",
+                "Most likely to have a photographic memory.",
+                "Most likely to be able to forget anything on command (like *utang*).",
+                "Most likely to be an amazing singer (even in the shower).",
+                "Most likely to be an amazing dancer (like a TikTok pro).",
+                "Most likely to be able to speak all Filipino dialects.",
+                "Most likely to be able to play all instruments.",
+                "Most likely to live in BGC (Bonifacio Global City).",
+                "Most likely to live on a remote farm in the province.",
+                "Most likely to want to be famous and have no privacy.",
+                "Most likely to want to be unknown but have total freedom.",
+                "Most likely to want a personal chef (who can cook perfect *sinigang*).",
+                "Most likely to want a personal driver (to survive EDSA).",
+                "Most likely to find true love (on a dating app).",
+                "Most likely to win 10 Million Pesos.",
+                "Most likely to choose the ability to fly (over the traffic).",
+                "Most likely to choose the ability to be invisible.",
+                "Most likely to rather be 4 feet tall.",
+                "Most likely to rather be 8 feet tall.",
+                "Most likely to have to sing everything they say (like a musical).",
+                "Most likely to have to dance everywhere they go (like a TikToker).",
+                "Most likely to give up cheese for life.",
+                "Most likely to give up rice for life (impossible!).",
+                "Most likely to be the one to break up with someone.",
+                "Most likely to be the one who gets broken up with.",
+                "Most likely to be a genius but unhappy.",
+                "Most likely to be *'sakto lang'* (just average) but very happy.",
+                "Most likely to always be 10 minutes late ('Filipino time').",
+                "Most likely to always be 30 minutes early (a rare gem).",
+                "Most likely to want a third eye (to see ghosts).",
+                "Most likely to want a third arm (to carry more shopping bags).",
+                "Most likely to only be able to whisper.",
+                "Most likely to only be able to shout.",
+                "Most likely to tell on a friend for cheating.",
+                "Most likely to keep a secret, no matter what.",
+                "Most likely to return a lost wallet with all the money."
+            ];
+            
+            let mltCurrentIndex = 0;
+            let mltShuffledQuestions = [];
+
+            // Get MLT DOM Elements
+            const mltQuestionTextEl = document.getElementById('mlt-questionText');
+            const mltCounterTextEl = document.getElementById('mlt-counter');
+            const mltNextButton = document.getElementById('mlt-nextButton');
+            const mltShuffleButton = document.getElementById('mlt-shuffleButton');
+
+            // --- MLT Main Functions ---
+
+            function shuffleMLTQuestions() {
+                mltShuffledQuestions = [...mltQuestions];
+                for (let i = mltShuffledQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [mltShuffledQuestions[i], mltShuffledQuestions[j]] = [mltShuffledQuestions[j], mltShuffledQuestions[i]];
+                }
+                mltCurrentIndex = 0;
+                displayMLTQuestion(mltCurrentIndex);
+            }
+
+            function displayMLTQuestion(index) {
+                mltQuestionTextEl.style.opacity = '0';
+                mltQuestionTextEl.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    mltQuestionTextEl.textContent = mltShuffledQuestions[index];
+                    mltCounterTextEl.textContent = `Question ${index + 1} / ${mltShuffledQuestions.length}`;
+                    mltQuestionTextEl.style.opacity = '1';
+                    mltQuestionTextEl.style.transform = 'translateY(0)';
+                }, 300);
+            }
+
+            function nextMLTQuestion() {
+                mltCurrentIndex++;
+                if (mltCurrentIndex >= mltShuffledQuestions.length) {
+                    mltCurrentIndex = 0;
+                }
+                displayMLTQuestion(mltCurrentIndex);
+            }
+
+            // --- MLT Initialization ---
+            mltNextButton.addEventListener('click', nextMLTQuestion);
+            mltShuffleButton.addEventListener('click', shuffleMLTQuestions);
+            shuffleMLTQuestions(); // Shuffle MLT deck on load
+        });
+    </script>
+</body>
+</html>
+
+
